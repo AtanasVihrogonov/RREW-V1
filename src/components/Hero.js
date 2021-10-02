@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components/macro';
 import { Button } from './Button';
 import { IoMdArrowRoundForward } from 'react-icons/io';
@@ -132,15 +132,40 @@ const Hero = ({ slides }) => {
   const length = slides.length;
   const timeout = useRef(null);
 
+  // useEffect(() => {
+  //   const nextSlide = () => {
+  //     setCurrent((current) => (current === length - 1 ? 0 : current + 1));
+  //   };
+
+  //   timeout.current = setTimeout(nextSlide, 5000);
+
+  //   return function () {
+  //     if (timeout.current) {
+  //       clearTimeout(timeout.current);
+  //     }
+  //   };
+  // }, [current, length]);
+
   const nextSlide = () => {
     setCurrent(current === length - 1 ? 0 : current + 1);
     // console.log(current);
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+    }
   };
 
   const prevSlide = () => {
     setCurrent(current === 0 ? length - 1 : current - 1);
     // console.log(current);
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+    }
   };
+
+  // Check to make sure if there is no data set to null
+  if (!Array.isArray(slides) || slides.length <= 0) {
+    return null;
+  }
 
   return (
     <HeroSection>
@@ -148,23 +173,25 @@ const Hero = ({ slides }) => {
         {slides.map((slide, index) => {
           return (
             <HeroSlide key={index}>
-              <HeroSlider>
-                <HeroImage src={slide.image} alt={slide.alt} />
-                <HeroContent>
-                  <h1>{slide.title}</h1>
-                  <p>{slide.price}</p>
-                  <Button
-                    to={slide.path}
-                    primary='true'
-                    css={`
-                      max-width: 160px;
-                    `}
-                  >
-                    {slide.label}
-                    <Arrow />
-                  </Button>
-                </HeroContent>
-              </HeroSlider>
+              {index === current && (
+                <HeroSlider>
+                  <HeroImage src={slide.image} alt={slide.alt} />
+                  <HeroContent>
+                    <h1>{slide.title}</h1>
+                    <p>{slide.price}</p>
+                    <Button
+                      to={slide.path}
+                      primary='true'
+                      css={`
+                        max-width: 160px;
+                      `}
+                    >
+                      {slide.label}
+                      <Arrow />
+                    </Button>
+                  </HeroContent>
+                </HeroSlider>
+              )}
             </HeroSlide>
           );
         })}
